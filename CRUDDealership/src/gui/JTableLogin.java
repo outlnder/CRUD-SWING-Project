@@ -2,43 +2,25 @@ package gui;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import entities.User;
-import entities.Admin;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import entities.*;
 
 public class JTableLogin extends JFrame {
-
-	//
-	private static final long serialVersionUID = 1L;
 	
 	private JPanel contentPane;
 	private JTextField textUserName;
 	private JTextField textPassword;
 	private static HashMap<String, String> loginCredentials;
-	public static JTableLogin frame;
-
+	public static JTableLogin frame;	
+	
+	
 	/**
 	 * Launch the application.
-	 */
+	 */	
 	public static void main(String[] args) {
 		
-		loginCredentials = new HashMap<>();
-		Admin admin1 = new Admin("admin1", "admin1");
-		User user1 = new User("user1", "user1");
-		User user2 = new User("user2", "user2");
-		User user3 = new User("user3", "user3");
-		User user4 = new User("user4", "user4");
-		User user5 = new User("user5", "user5");
-		
-		loginCredentials.put(user1.getLogin(), user1.getPassword());
-		loginCredentials.put(user2.getLogin(), user2.getPassword());
-		loginCredentials.put(user3.getLogin(), user3.getPassword());
-		loginCredentials.put(user4.getLogin(), user4.getPassword());
-		loginCredentials.put(user5.getLogin(), user5.getPassword());
-		loginCredentials.put(admin1.getLogin(), admin1.getPassword());
-       
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -49,11 +31,11 @@ public class JTableLogin extends JFrame {
 				}
 			}
 		});
-	}
+	}	
 
 	/**
 	 * Create the frame.
-	 */
+	 */	
 	public JTableLogin() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100,300, 200);
@@ -82,16 +64,31 @@ public class JTableLogin extends JFrame {
 		textPassword.setBounds(123, 70, 120, 25);
 		contentPane.add(textPassword);
 		
+		
+		
 		JButton btnLogin = new JButton("LOGIN");
-		btnLogin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btnLogin.addActionListener(new ActionListener() {		//ActionListener inner class
+			public void actionPerformed(ActionEvent e) {				
 				
-				String username = textUserName.getText();
-				String password = textPassword.getText();
+					loginCredentials = new HashMap<>();
+					assert User.getList()==null : "Empty Source Of Users";
+					for (User user: User.getList()) {
+						loginCredentials.put(user.getLogin(), user.getPassword());
+					}
+					assert Admin.getList()==null : "Empty Source Of Admins";
+					for (Admin admin: Admin.getList()) {
+						loginCredentials.put(admin.getLogin(), admin.getPassword());
+					}
+					
+				
+				String username = textUserName.getText();				
+				String password = textPassword.getText();				
 				
 				if (loginCredentials.containsKey(username)&&loginCredentials.get(username).equals(password)){
+					//close login window
 					frame.setVisible(false);
 					frame.dispose();
+					//launch main window
 					JTableApp app = new JTableApp();
 					app.setVisible(true);
 					JTableApp.startJTableApp();	

@@ -1,16 +1,25 @@
 package db;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import entities.Car;
+import gui.*;
 
 
 public class DBConnection {
 	
+	private JTable table;
+	
 	String conString = "jdbc:mysql://localhost:3306/?allowPublicKeyRetrieval=true&useSSL=false";
     String username = "root";
-    String password = "Pilsner1";
+    String password = "root";
+    ArrayList<Car> list = (ArrayList<Car>) carList();
+    ArrayList<Car> searchedList = new ArrayList<Car>();
  
-    //INSERT INTO DB
+    //Insert into database
     public Boolean add(String vin, String make, String model, int year, double price, String body, String color, int mileage,
     		String transmission, String description, String condition, String status) {
         
@@ -22,9 +31,10 @@ public class DBConnection {
  
         try {
             //GET COONECTION
-            Connection con = DriverManager.getConnection(conString, username, password);             
-            PreparedStatement ps = con.prepareStatement(insertQuery);            
-            ps.execute(insertQuery);          
+            Connection con = DriverManager.getConnection(conString, username, password);
+            assert con != null : "Connection is null";
+            Statement s = con.createStatement();            
+            s.execute(insertQuery);          
             con.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -33,55 +43,76 @@ public class DBConnection {
         return true;
     }
  
-    //RETRIEVE DATA
-    public DefaultTableModel getData() {
-    	
-        //ADD COLUMNS TO TABLE MODEL
-        DefaultTableModel dm = new DefaultTableModel();
-        dm.addColumn("VIN");
-        dm.addColumn("Make");
-        dm.addColumn("Model");
-        dm.addColumn("Year");
-        dm.addColumn("Price");
-        dm.addColumn("Body");
-        dm.addColumn("Color");
-        dm.addColumn("Mileage");
-        dm.addColumn("Transmission");
-        dm.addColumn("Description");
-        dm.addColumn("Condition");
-        dm.addColumn("Status");
- 
+    //Get ArrayList of Car objects from database
+    public ArrayList<Car> carList() {
+    	 
+    	ArrayList<Car> carList = new ArrayList<Car>();		
+		
         String selectQuery = "SELECT * FROM `car_dealership`.`dealership_inventory`";
  
         try {
-            Connection con = DriverManager.getConnection(conString, username, password);             
-            Statement s = con.prepareStatement(selectQuery);            
+            Connection con = DriverManager.getConnection(conString, username, password);
+            assert con != null : "Connection is null";
+            Statement s = con.createStatement();             
             ResultSet rs = s.executeQuery(selectQuery);
  
-            //LOOP FOR GETTING ALL VALUES
             while (rs.next()) {
-                String vin = rs.getString(1);
-                String make = rs.getString(2);
-                String model = rs.getString(3);
-                String year = rs.getString(4);
-                String price = rs.getString(5);
-                String body = rs.getString(6);
-                String color = rs.getString(7);
-                String mileage = rs.getString(8);
-                String transmission = rs.getString(9);
-                String description = rs.getString(10);
-                String condition = rs.getString(11);
-                String status = rs.getString(12);
-                 
-                dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});                
-            } 
-        } catch (Exception ex) {
-            ex.printStackTrace();            
-        }        
-        return dm; 
+            	Car car = new Car();
+				car.setVin(rs.getString("vin"));
+				car.setMake(rs.getString("make"));
+				car.setModel(rs.getString("model"));				
+				car.setYear(rs.getInt("year"));
+				car.setPrice(rs.getDouble("price"));
+				car.setBody(rs.getString("body"));
+				car.setColor(rs.getString("color"));
+				car.setMileage(rs.getInt("mileage"));
+				car.setTransmission(rs.getString("transmission"));
+				car.setDescription(rs.getString("description"));
+				car.setCondition(rs.getString("sh_condition"));
+				car.setStatus(rs.getString("status"));
+				carList.add(car);
+			}
+            rs.close();
+            con.close();
+		} catch (SQLException ex) {
+			System.err.println(ex);	
+		}
+		return carList;
     }
- 
-    //UPDATE DATA
+        
+    
+    //Get data from ArrayList and insert it in application table
+    public DefaultTableModel getData() {    	
+    	
+    	Collections.sort(list, Car.CarVinComparator);
+        
+        String columns[] = {"vin", "make", "model", "year", "price", "body", "color", "mileage", "transmission", "description", "condition", "status"};
+
+        DefaultTableModel dm = new DefaultTableModel(columns, 0);
+        new DBConnection();
+                                                    
+
+        //Getting values from ArrayList
+        for(Car car: list) {        	
+            String vin = car.getVin();
+            String make = car.getMake();
+            String model = car.getModel();            
+            String year = String.valueOf(car.getYear());
+            String price = String.valueOf(car.getPrice());
+            String body = car.getBody();
+            String color = car.getColor();
+            String mileage = String.valueOf(car.getMileage());
+            String transmission = car.getTransmission();
+            String description = car.getDescription();
+            String condition = car.getCondition();
+            String status = car.getStatus();             
+            dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});            
+        }         
+    return dm; 
+    } 
+  
+    
+    //Update data
     public Boolean update(String VIN, String make, String model, int year, double price, String body, String color, int mileage,
     		String transmission, String description, String condition, String status) {
         
@@ -92,33 +123,68 @@ public class DBConnection {
 		         "', sh_condition = '"+condition+"', status = '"+status+"' WHERE vin = '" + VIN +"'";           
     	
         try {            
-            Connection con = DriverManager.getConnection(conString, username, password);            
-            Statement s = con.prepareStatement(updateQuery); 
+            Connection con = DriverManager.getConnection(conString, username, password); 
+            assert con != null : "Connection is null";
+            Statement s = con.createStatement(); 
             s.execute(updateQuery);
             con.close(); 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            System.out.println("boolean add method failed!");
+            ex.printStackTrace();            
             return false;
         }
         return true;
     }
  
-    //DELETE DATA
+    //Delete data
     public Boolean delete(String vin){
         
-        String delQuery = "DELETE FROM `car_dealership`.`dealership_inventory` WHERE (`vin` = " + vin +");";
+        String delQuery = "DELETE FROM `car_dealership`.`dealership_inventory` WHERE (`vin` = " + vin +")";
  
         try {            
-            Connection con=DriverManager.getConnection(conString, username, password);            
-            Statement s=con.prepareStatement(delQuery);            
+            Connection con = DriverManager.getConnection(conString, username, password);
+            assert con != null : "Connection is null";
+            Statement s = con.createStatement();           
             s.execute(delQuery);            
-            con.close();
-            
+            con.close();            
         }catch(Exception ex){
             ex.printStackTrace();            
             return false;
         }
         return true;
-    } 
+    }
+    
+    //Get data for searched VIN 
+    public DefaultTableModel getSearchedData(String searchVin) {    	
+    	
+    	for(Car car: list) {
+    		if(car.getVin().equals(searchVin)) {
+    			searchedList.add(car);    			
+    		}
+    	}
+    	Collections.sort(searchedList, Car.CarVinComparator);
+                
+        String columns[] = {"vin", "make", "model", "year", "price", "body", "color", "mileage", "transmission", "description", "condition", "status"};
+
+        DefaultTableModel dm = new DefaultTableModel(columns, 0);
+        new DBConnection();                                                   
+        
+        //Getting values from ArrayList
+        for(Car car: searchedList) {        	
+            String vin = car.getVin();
+            String make = car.getMake();
+            String model = car.getModel();            
+            String year = String.valueOf(car.getYear());
+            String price = String.valueOf(car.getPrice());
+            String body = car.getBody();
+            String color = car.getColor();
+            String mileage = String.valueOf(car.getMileage());
+            String transmission = car.getTransmission();
+            String description = car.getDescription();
+            String condition = car.getCondition();
+            String status = car.getStatus();             
+            dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});            
+        }         
+    return dm; 
+    }
+	
 }

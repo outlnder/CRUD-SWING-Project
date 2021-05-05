@@ -1,6 +1,8 @@
 package entities;
 
-public class Car {
+import java.util.Comparator;
+
+public class Car{
 	
 	private String vin;
 	private String make;
@@ -132,7 +134,15 @@ public class Car {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
 	
+	
+    public static Comparator<Car> CarVinComparator = new Comparator<Car>() {
 
+    	public int compare(Car car1, Car car2) {
+    	   String vin1 = car1.getVin().toUpperCase();
+    	   String vin2 = car2.getVin().toUpperCase();
+ 
+    	   return vin1.compareTo(vin2);
+     }};
+	
 }

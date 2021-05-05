@@ -1,6 +1,9 @@
 package entities;
 
-public class User extends Admin{	
+import java.util.ArrayList;
+import java.util.List;
+
+public class User extends GeneralUser{	
 
 	private String login, password;
 	
@@ -18,6 +21,21 @@ public class User extends Admin{
 		this.login = login;
         this.password = password;
 	}
+	
+	@SuppressWarnings("serial")
+	private static List<User> userList = new ArrayList<User>(){
+		{
+		add(new User("user1", "user1"));
+		add(new User("user2", "user2"));
+		add(new User("user3", "user3"));
+		add(new User("user4", "user4"));
+		add(new User("user5", "user5"));
+		}
+	};
 
 	
+	
+	public static List<User> getList() {
+		return userList;
+	}	
 }

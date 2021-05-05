@@ -3,14 +3,11 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-
+import javax.swing.table.*;
 import db.DBConnection;
 
+
 public class JTableApp extends JFrame{
-	
-	//this variable removes suppressed warning
-	private static final long serialVersionUID = 1L;
 	
 	// Variables declaration
 	private JTextField textVIN;	
@@ -20,23 +17,20 @@ public class JTableApp extends JFrame{
 	private JTextField price;
 	private JTextField color;
 	private JTextField mileage;
-	private JTextField description;	
+	private JTextField description;
+	private JTextField textSearch;
 	
 	private JButton btnAdd;
 	private JButton btnUpdate;
 	private JButton btnDel;
 	private JButton btnClear;
-
+	private DefaultTableModel dm;
+	
 	private JFrame MainFrame;
 	private JTable table;
-	private JScrollPane scrollPane;
+	private JScrollPane scrollPane;	 
 	
-	
-
-	/**
-	 * Launch the application.
-	 */
-	
+	//Launch the application	 
 	public static void startJTableApp() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -51,26 +45,30 @@ public class JTableApp extends JFrame{
 		
 	}
 
-	/**
-	 * Create the application window.
-	 */
+	//Create the application window	 
 	public JTableApp() {
 		initialize();
 		retrieve();
-	}
+	}	
 	
-	/**
-	 * Retrieve data from database and populate application table.
-	 */
+	
+	//Update application table after every change	
 	private void retrieve(){
-     DefaultTableModel dm = new DBConnection().getData(); 
-     table.setModel(dm);
+		dm = new DBConnection().getData();
+		table.setModel(dm);          
+     
+     
+     table.setAutoCreateRowSorter(true);
     }
+	
+	//Update application table after every change	
+		private void retrieveSearchedTable(String searchVin){
+			dm = new DBConnection().getSearchedData(searchVin);
+			table.setModel(dm);   
+	    }
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
+	//Initialize the contents of the frame	
+	private void initialize() {		
 		
 		//jframe
 		MainFrame = new JFrame();
@@ -169,8 +167,7 @@ public class JTableApp extends JFrame{
 		price.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		price.setBounds(102, 190, 120, 30);
 		MainFrame.getContentPane().add(price);
-		//price.setColumns(10);		
-		
+				
 		color = new JTextField();
 		color.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		color.setColumns(10);
@@ -189,7 +186,12 @@ public class JTableApp extends JFrame{
 		description.setBounds(438, 149, 120, 30);
 		MainFrame.getContentPane().add(description);
 		
-		@SuppressWarnings("rawtypes")
+		textSearch = new JTextField();
+		textSearch.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		textSearch.setColumns(10);
+		textSearch.setBounds(115, 280, 100, 20);
+		MainFrame.getContentPane().add(textSearch);		
+		
 		JComboBox body = new JComboBox();
 		body.setAutoscrolls(true);
 		body.setModel(new DefaultComboBoxModel(new String[] {"SUV", "Sedan", "Hatchback", "Truck", "Coupe", "Convertible", "Other"}));
@@ -197,9 +199,8 @@ public class JTableApp extends JFrame{
 		body.setName("Body");
 		body.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		body.setBounds(102, 231, 120, 30);
-		MainFrame.getContentPane().add(body);
+		MainFrame.getContentPane().add(body);		
 		
-		@SuppressWarnings("rawtypes")
 		JComboBox transmission = new JComboBox();
 		transmission.setName("transmission");
 		transmission.setAutoscrolls(true);
@@ -207,37 +208,34 @@ public class JTableApp extends JFrame{
 		transmission.setModel(new DefaultComboBoxModel(new String[] {"Automatic", "Manual", "Other"}));
 		transmission.setSelectedIndex(0);
 		transmission.setBounds(438, 108, 120, 30);
-		MainFrame.getContentPane().add(transmission);
+		MainFrame.getContentPane().add(transmission);		
 		
-		@SuppressWarnings("rawtypes")
 		JComboBox status = new JComboBox();
 		status.setAutoscrolls(true);
 		status.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		status.setModel(new DefaultComboBoxModel(new String[] {"In Stock", "Sold", "Pending"}));
 		status.setSelectedIndex(0);
 		status.setBounds(438, 231, 120, 30);
-		MainFrame.getContentPane().add(status);
+		MainFrame.getContentPane().add(status);		
 		
-		@SuppressWarnings("rawtypes")
 		JComboBox condition = new JComboBox();
 		condition.setModel(new DefaultComboBoxModel(new String[] {"New", "Used"}));
 		condition.setSelectedIndex(0);
 		condition.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		condition.setAutoscrolls(true);
 		condition.setBounds(438, 190, 120, 30);
-		MainFrame.getContentPane().add(condition);
-		
-		
+		MainFrame.getContentPane().add(condition);		
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(32, 286, 814, 135);
+		scrollPane.setBounds(32, 304, 814, 135);
 		MainFrame.getContentPane().add(scrollPane);
 		
 		table = new JTable();
 		table.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent evt) {
+		table.addMouseListener(new MouseAdapter() {		//MouseAdapter inner class
+            
+			public void mouseClicked(MouseEvent evt) {
             	//get values from selected row
             	String vin = table.getValueAt(table.getSelectedRow(), 0).toString();
     	        String make = table.getValueAt(table.getSelectedRow(), 1).toString();
@@ -279,12 +277,52 @@ public class JTableApp extends JFrame{
 		
 		//buttons
 		btnAdd = new JButton("ADD");
-		btnAdd.addActionListener(new ActionListener() {
+		btnAdd.addActionListener(new ActionListener() {		//ActionListener inner class
 			public void actionPerformed(ActionEvent e) {
-				 if (new DBConnection().add(textVIN.getText(), textMake.getText(), textModel.getText(), Integer.parseInt(year.getText()),
+				
+				if(textVIN.getText().length()<1||textVIN.getText().length()>14) {
+					JOptionPane.showMessageDialog(null, "VIN must be between 1 and 14 characters!");
+				}
+				if (textMake.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Make cannot be empty!");
+				}
+				if (textModel.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Model cannot be empty!");
+				}
+				if (year.getText().length()< 1|| Integer.parseInt(year.getText())>2021||Integer.parseInt(year.getText())<1925) {
+					JOptionPane.showMessageDialog(null, "Enter correct year!");
+				}
+				if (price.getText().length()<1 || Double.parseDouble(price.getText())<1.0) {
+					JOptionPane.showMessageDialog(null, "Enter correct price!");
+				}
+				if (color.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Color cannot be empty!");
+				}
+				if(mileage.getText().length()<1 || Integer.parseInt(mileage.getText())<1) {
+					JOptionPane.showMessageDialog(null, "Enter correct mileage!");
+				}
+				if (description.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Description cannot be empty!");
+				}				
+				if (textVIN.getText().length()>0
+						 && textVIN.getText().length()<=14
+						 && textMake.getText().length()>0						 
+						 && textModel.getText().length()>0
+						 && year.getText().length()>0
+						 && Integer.parseInt(year.getText())<=2021
+						 && Integer.parseInt(year.getText())>=1925
+						 && price.getText().length()>1
+						 && Double.parseDouble(price.getText())>1.0
+						 && color.getText().length()>0
+						 && mileage.getText().length()>0
+						 && Integer.parseInt(mileage.getText())>0
+						 && description.getText().length()>0
+						 && new DBConnection().add(textVIN.getText(), textMake.getText(), textModel.getText(), Integer.parseInt(year.getText()),
 			        		Double.parseDouble(price.getText()), body.getSelectedItem().toString(), color.getText(), Integer.parseInt(mileage.getText()),
 			        		transmission.getSelectedItem().toString(), description.getText(), condition.getSelectedItem().toString(),
-			        		status.getSelectedItem().toString())) {
+			        		status.getSelectedItem().toString()) )
+						  
+					{
 			            JOptionPane.showMessageDialog(null, "Successfully Inserted");
 			 
 			            //CLEAR TXT
@@ -298,10 +336,10 @@ public class JTableApp extends JFrame{
 			            description.setText("");
 			            			 
 			            retrieve();
-			        } else {
-			            JOptionPane.showMessageDialog(null, "Not Saved");
-			            System.out.println("add button failed!");
 			        }
+				else {
+			            JOptionPane.showMessageDialog(null, "Not Saved");			            
+			   }
 			}
 		});
 		btnAdd.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -311,15 +349,50 @@ public class JTableApp extends JFrame{
 		
 		
 		btnUpdate = new JButton("UPDATE");
-		btnUpdate.addActionListener(new ActionListener() {
+		btnUpdate.addActionListener(new ActionListener() {		//ActionListener inner class
 			public void actionPerformed(ActionEvent e) {
-		        int index = table.getSelectedRow();
-		        String id = table.getValueAt(index, 0).toString();
-		 
-		        if (new DBConnection().update(textVIN.getText(), textMake.getText(), textModel.getText(), Integer.parseInt(year.getText()),
-		        		Double.parseDouble(price.getText()), body.getSelectedItem().toString(), color.getText(), Integer.parseInt(mileage.getText()),
-		        		transmission.getSelectedItem().toString(), description.getText(), condition.getSelectedItem().toString(),
-		        		status.getSelectedItem().toString())) {
+		       
+				if(textVIN.getText().length()<1||textVIN.getText().length()>14) {
+					JOptionPane.showMessageDialog(null, "VIN must be between 1 and 14 characters!");
+				}
+				if (textMake.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Make cannot be empty!");
+				}
+				if (textModel.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Model cannot be empty!");
+				}
+				if (year.getText().length()< 1|| Integer.parseInt(year.getText())>2021||Integer.parseInt(year.getText())<1925) {
+					JOptionPane.showMessageDialog(null, "Enter correct year!");
+				}
+				if (price.getText().length()<1 || Double.parseDouble(price.getText())<1.0) {
+					JOptionPane.showMessageDialog(null, "Enter correct price!");
+				}
+				if (color.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Color cannot be empty!");
+				}
+				if(mileage.getText().length()<1 || Integer.parseInt(mileage.getText())<1) {
+					JOptionPane.showMessageDialog(null, "Enter correct mileage!");
+				}
+				if (description.getText().length()<1) {
+					JOptionPane.showMessageDialog(null, "Description cannot be empty!");
+				}
+				if (textVIN.getText().length()>0
+						 && textVIN.getText().length()<=14
+						 && textMake.getText().length()>0						 
+						 && textModel.getText().length()>0
+						 && year.getText().length()>0
+						 && Integer.parseInt(year.getText())<=2021
+						 && Integer.parseInt(year.getText())>=1925
+						 && price.getText().length()>1
+						 && Double.parseDouble(price.getText())>1.0
+						 && color.getText().length()>0
+						 && mileage.getText().length()>0
+						 && Integer.parseInt(mileage.getText())>0
+						 && description.getText().length()>0
+						 && new DBConnection().update(textVIN.getText(), textMake.getText(), textModel.getText(), Integer.parseInt(year.getText()),
+		        		 Double.parseDouble(price.getText()), body.getSelectedItem().toString(), color.getText(), Integer.parseInt(mileage.getText()),
+		        		 transmission.getSelectedItem().toString(), description.getText(), condition.getSelectedItem().toString(),
+		        		 status.getSelectedItem().toString())) {
 		            JOptionPane.showMessageDialog(null, "Successfully Updated");
 		 
 		            //CLEAR TXT
@@ -334,8 +407,7 @@ public class JTableApp extends JFrame{
 		 
 		            retrieve();
 		        } else {
-		            JOptionPane.showMessageDialog(null, "Not Updated");
-		            System.out.println("update button failed!");
+		            JOptionPane.showMessageDialog(null, "Not Updated");		            
 		        }
 			}
 		});
@@ -346,16 +418,14 @@ public class JTableApp extends JFrame{
 		
 		
 		btnDel = new JButton("DELETE");
-		btnDel.addActionListener(new ActionListener() {
+		btnDel.addActionListener(new ActionListener() {		//ActionListener inner class
 			public void actionPerformed(ActionEvent e) {
 		        String[] options = {"Yes", "No"};
 		        int answ = JOptionPane.showOptionDialog(null, "Sure To Delete?", "Deleted",
-		        		JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-		 
-		        if (answ == 0) {
-		            int index = table.getSelectedRow();
-		            String id = table.getValueAt(index, 0).toString();
-		 
+		        		JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);		 
+		        	if (answ == 0) {
+		        		int index = table.getSelectedRow();
+		        		String id = table.getValueAt(index, 0).toString();		 
 		            if (new DBConnection().delete(id)) {
 		                JOptionPane.showMessageDialog(null, "Deleted");
 		 
@@ -369,11 +439,10 @@ public class JTableApp extends JFrame{
 			            mileage.setText("");
 			            description.setText("");
 		 
-		           retrieve();
+			        retrieve();
 		            } else
 		            {
-		                JOptionPane.showMessageDialog(null, "Not Deleted");
-		                System.out.println("delete button failed!");
+		                JOptionPane.showMessageDialog(null, "Not Deleted");		                
 		            }		 
 		        }
 			}
@@ -385,7 +454,7 @@ public class JTableApp extends JFrame{
 		
 		
 		btnClear = new JButton("CLEAR");
-		btnClear.addActionListener(new ActionListener() {
+		btnClear.addActionListener(new ActionListener() {		//ActionListener inner class
 			public void actionPerformed(ActionEvent e) {
 				 
 				textVIN.setText("");
@@ -400,7 +469,46 @@ public class JTableApp extends JFrame{
 		});
 		btnClear.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnClear.setBounds(683, 191, 100, 30);
-		MainFrame.getContentPane().add(btnClear); 		
+		MainFrame.getContentPane().add(btnClear);		
 		
-	}	
+		JButton btnSearch = new JButton("VIN search");
+		btnSearch.addActionListener(new ActionListener() {		//ActionListener inner class
+			public void actionPerformed(ActionEvent e) {
+				if(!textSearch.getText().equals("")) {
+					
+					//CLEAR TXT
+		            textVIN.setText("");
+		            textMake.setText("");
+		            textModel.setText("");
+		            year.setText("");
+		            price.setText("");
+		            color.setText("");
+		            mileage.setText("");
+		            description.setText("");
+		 
+		            retrieveSearchedTable(textSearch.getText());					
+				}
+				else {
+					retrieve();	
+					JOptionPane.showMessageDialog(null, "Enter VIN!");				
+				}
+			}
+		});
+		
+		btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnSearch.setBounds(25, 280, 92, 20);
+		MainFrame.getContentPane().add(btnSearch);
+		
+		
+		JButton btnLoad = new JButton("LOAD");
+		btnLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		btnLoad.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnLoad.setBounds(683, 237, 100, 30);
+		MainFrame.getContentPane().add(btnLoad);
+		
+	}
 }
