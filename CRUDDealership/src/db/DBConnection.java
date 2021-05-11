@@ -1,8 +1,9 @@
 package db;
 
+import java.io.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.*;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import entities.Car;
@@ -13,38 +14,15 @@ public class DBConnection {
 	
 	private JTable table;
 	
-	String conString = "jdbc:mysql://localhost:3306/?allowPublicKeyRetrieval=true&useSSL=false";
-    String username = "root";
-    String password = "root";
+	static String conString = "jdbc:mysql://localhost:3306/?allowPublicKeyRetrieval=true&useSSL=false";
+    static String username = "root";
+    static String password = "Pilsner1";
     ArrayList<Car> list = (ArrayList<Car>) carList();
+    
     ArrayList<Car> searchedList = new ArrayList<Car>();
- 
-    //Insert into database
-    public Boolean add(String vin, String make, String model, int year, double price, String body, String color, int mileage,
-    		String transmission, String description, String condition, String status) {
-        
-    	String insertQuery = 
-				"INSERT INTO car_dealership.dealership_inventory (`vin`, `make`, `model`, `year`, `price`, `body`, " + 
-				"`color`, `mileage`, `transmission`, `description`, `sh_condition`, `status`) "
-                + "VALUES ('"+vin+"', '"+make+"', '"+model+"', '"+year+"', '"+price+"', '"+body+"', "
-                + " '"+color+"', '"+mileage+"', '"+transmission+"', '"+description+"', '"+condition+"', '"+status+"');";                		  
- 
-        try {
-            //GET COONECTION
-            Connection con = DriverManager.getConnection(conString, username, password);
-            assert con != null : "Connection is null";
-            Statement s = con.createStatement();            
-            s.execute(insertQuery);          
-            con.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
- 
-    //Get ArrayList of Car objects from database
-    public ArrayList<Car> carList() {
+    
+  //Get ArrayList of Car objects from database
+    public static ArrayList<Car> carList() {
     	 
     	ArrayList<Car> carList = new ArrayList<Car>();		
 		
@@ -78,8 +56,7 @@ public class DBConnection {
 			System.err.println(ex);	
 		}
 		return carList;
-    }
-        
+    }        
     
     //Get data from ArrayList and insert it in application table
     public DefaultTableModel getData() {    	
@@ -89,8 +66,7 @@ public class DBConnection {
         String columns[] = {"vin", "make", "model", "year", "price", "body", "color", "mileage", "transmission", "description", "condition", "status"};
 
         DefaultTableModel dm = new DefaultTableModel(columns, 0);
-        new DBConnection();
-                                                    
+        new DBConnection();                                                    
 
         //Getting values from ArrayList
         for(Car car: list) {        	
@@ -109,11 +85,35 @@ public class DBConnection {
             dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});            
         }         
     return dm; 
-    } 
-  
+    }    
+    
+    //Insert into database
+    public static Boolean add(String vin, String make, String model, int year, double price, String body, String color, int mileage,
+    		String transmission, String description, String condition, String status) {
+        
+    	String insertQuery = 
+				"INSERT INTO car_dealership.dealership_inventory (`vin`, `make`, `model`, `year`, `price`, `body`, " + 
+				"`color`, `mileage`, `transmission`, `description`, `sh_condition`, `status`) "
+                + "VALUES ('"+vin+"', '"+make+"', '"+model+"', '"+year+"', '"+price+"', '"+body+"', "
+                + " '"+color+"', '"+mileage+"', '"+transmission+"', '"+description+"', '"+condition+"', '"+status+"');";                		  
+ 
+        try {
+            //GET COONECTION
+            Connection con = DriverManager.getConnection(conString, username, password);
+            assert con != null : "Connection is null";
+            Statement s = con.createStatement();            
+            s.execute(insertQuery);          
+            con.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+ 
     
     //Update data
-    public Boolean update(String VIN, String make, String model, int year, double price, String body, String color, int mileage,
+    public static Boolean update(String VIN, String make, String model, int year, double price, String body, String color, int mileage,
     		String transmission, String description, String condition, String status) {
         
     	String updateQuery = 
@@ -185,6 +185,79 @@ public class DBConnection {
             dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});            
         }         
     return dm; 
+    }
+    
+    public static void loadFromFile(){
+    	ArrayList<Car> listForComparison = carList();
+    	BufferedReader br = null;
+    	//list of arrays, where each array represents a car (read from backup file)
+    	ArrayList<String[]> carsInFile = new ArrayList<String[]>();
+    	//list of VINs, read from database
+    	ArrayList<String> carsInDb = listForComparison.stream().
+    			map(Car::getVin).
+    			collect(Collectors.toCollection(ArrayList::new));    	
+        try {
+            br = new BufferedReader(new FileReader("D:\\backupfile.txt"));
+            String line;
+            while ((line = br.readLine()) != null) {
+            	String[] values = line.split("\\|"); 
+            	if (values[0].length() > 4)
+            	carsInFile.add(values);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {if (br != null) 
+                    br.close();                
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }        
+    	
+        for(String[] s : carsInFile) {
+        	if(!carsInDb.contains(s[0]))        		
+        	add(s[0], s[1], s[2], Integer.parseInt(s[3]), Double.parseDouble(s[4]), s[5], s[6], 
+        			Integer.parseInt(s[7]), s[8], s[9], s[10], s[11]);        	
+        	
+        	else
+        	update(s[0], s[1], s[2], Integer.parseInt(s[3]), Double.parseDouble(s[4]), s[5], s[6], 
+        			Integer.parseInt(s[7]), s[8], s[9], s[10], s[11]);        	
+        }        
+    }
+    
+    public static void copyToFile() {
+    	try {    			
+			String selectQuery = "SELECT * FROM `car_dealership`.`dealership_inventory`";
+            Connection con = DriverManager.getConnection(conString, username, password);
+            assert con != null : "Connection is null";
+            Statement s = con.createStatement();             
+            ResultSet rs = s.executeQuery(selectQuery);
+            String line = "";
+            File file = new File("D:/backupfile.txt");
+            FileWriter fw = new FileWriter(file);
+            PrintWriter pw = new PrintWriter(fw);
+            while (rs.next()) {                	
+				line = line.concat(rs.getString("vin") + "|");
+				line = line.concat(rs.getString("make") + "|");
+				line = line.concat(rs.getString("model") + "|");				
+				line = line.concat(rs.getInt("year") + "|");
+				line = line.concat(rs.getDouble("price") + "|");
+				line = line.concat(rs.getString("body") + "|");
+				line = line.concat(rs.getString("color") + "|");
+				line = line.concat(rs.getInt("mileage") + "|");
+				line = line.concat(rs.getString("transmission") + "|");
+				line = line.concat(rs.getString("description") + "|");
+				line = line.concat(rs.getString("sh_condition") + "|");	
+				line = line.concat(rs.getString("status") + "| " + "\n");				
+			}
+            pw.println(line);
+			pw.flush();
+            pw.close();
+            rs.close();
+            con.close();            
+		} catch (SQLException|IOException ex) {
+			System.err.println(ex);	
+		}
     }
 	
 }

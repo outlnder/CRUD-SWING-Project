@@ -1,0 +1,20 @@
+1000001 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | In stock | 
+
+1000001 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | In stock | 
+1000003 | Honda | Corolla | 2020 | 31500.0 | Sedan | white | 150 | Automatic | Leather | New | In Stock | 
+
+1000001 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | In stock | 
+1000003 | Honda | Corolla | 2020 | 31500.0 | Sedan | white | 150 | Automatic | Leather | New | In Stock | 
+1000027 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | Pending | 
+
+1000001 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | In stock | 
+1000003 | Honda | Corolla | 2020 | 31500.0 | Sedan | white | 150 | Automatic | Leather | New | In Stock | 
+1000027 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | Pending | 
+1000028 | Honda | Rocket | 2020 | 22000.0 | Truck | gold | 3000 | Automatic | na | New | In Stock | 
+
+1000001 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | In stock | 
+1000003 | Honda | Corolla | 2020 | 31500.0 | Sedan | white | 150 | Automatic | Leather | New | In Stock | 
+1000027 | Toyota | RAV4 | 2020 | 35000.0 | SUV | black | 2000 | Automatic | Leather | Used | Pending | 
+1000028 | Honda | Rocket | 2020 | 22000.0 | Truck | gold | 3000 | Automatic | na | New | In Stock | 
+1000030 | Mazda | 6 | 2021 | 35000.0 | Sedan | blue | 150 | Automatic | sunroof | New | In Stock | 
+

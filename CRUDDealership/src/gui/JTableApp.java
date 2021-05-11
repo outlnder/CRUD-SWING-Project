@@ -55,8 +55,7 @@ public class JTableApp extends JFrame{
 	//Update application table after every change	
 	private void retrieve(){
 		dm = new DBConnection().getData();
-		table.setModel(dm);          
-     
+		table.setModel(dm);    
      
      table.setAutoCreateRowSorter(true);
     }
@@ -73,7 +72,7 @@ public class JTableApp extends JFrame{
 		//jframe
 		MainFrame = new JFrame();
 		MainFrame.setTitle("BRAZHKO MOTORS");
-		MainFrame.setBounds(100, 100, 900, 500);
+		MainFrame.setBounds(100, 100, 900, 560);
 		MainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		MainFrame.getContentPane().setLayout(null);
 		
@@ -189,7 +188,7 @@ public class JTableApp extends JFrame{
 		textSearch = new JTextField();
 		textSearch.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textSearch.setColumns(10);
-		textSearch.setBounds(115, 280, 100, 20);
+		textSearch.setBounds(115, 280, 100, 25);
 		MainFrame.getContentPane().add(textSearch);		
 		
 		JComboBox body = new JComboBox();
@@ -227,7 +226,7 @@ public class JTableApp extends JFrame{
 		MainFrame.getContentPane().add(condition);		
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(32, 304, 814, 135);
+		scrollPane.setBounds(32, 319, 816, 174);
 		MainFrame.getContentPane().add(scrollPane);
 		
 		table = new JTable();
@@ -278,10 +277,11 @@ public class JTableApp extends JFrame{
 		//buttons
 		btnAdd = new JButton("ADD");
 		btnAdd.addActionListener(new ActionListener() {		//ActionListener inner class
+			@SuppressWarnings("static-access")
 			public void actionPerformed(ActionEvent e) {
 				
-				if(textVIN.getText().length()<1||textVIN.getText().length()>14) {
-					JOptionPane.showMessageDialog(null, "VIN must be between 1 and 14 characters!");
+				if(textVIN.getText().length()<4||textVIN.getText().length()>=14) {
+					JOptionPane.showMessageDialog(null, "VIN must be between 5 and 14 characters!");
 				}
 				if (textMake.getText().length()<1) {
 					JOptionPane.showMessageDialog(null, "Make cannot be empty!");
@@ -350,10 +350,11 @@ public class JTableApp extends JFrame{
 		
 		btnUpdate = new JButton("UPDATE");
 		btnUpdate.addActionListener(new ActionListener() {		//ActionListener inner class
+			@SuppressWarnings("static-access")
 			public void actionPerformed(ActionEvent e) {
 		       
-				if(textVIN.getText().length()<1||textVIN.getText().length()>14) {
-					JOptionPane.showMessageDialog(null, "VIN must be between 1 and 14 characters!");
+				if(textVIN.getText().length()<4||textVIN.getText().length()>=14) {
+					JOptionPane.showMessageDialog(null, "VIN must be between 5 and 14 characters!");
 				}
 				if (textMake.getText().length()<1) {
 					JOptionPane.showMessageDialog(null, "Make cannot be empty!");
@@ -412,7 +413,7 @@ public class JTableApp extends JFrame{
 			}
 		});
 		btnUpdate.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUpdate.setBounds(683, 84, 100, 30);
+		btnUpdate.setBounds(683, 68, 100, 30);
 		MainFrame.getContentPane().add(btnUpdate);
 		
 		
@@ -448,15 +449,12 @@ public class JTableApp extends JFrame{
 			}
 		});
 		btnDel.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnDel.setBounds(683, 138, 100, 30);
-		MainFrame.getContentPane().add(btnDel);
-		
+		btnDel.setBounds(683, 109, 100, 30);
+		MainFrame.getContentPane().add(btnDel);		
 		
 		
 		btnClear = new JButton("CLEAR");
-		btnClear.addActionListener(new ActionListener() {		//ActionListener inner class
-			public void actionPerformed(ActionEvent e) {
-				 
+		btnClear.addActionListener(	(event)->{		//ActionListener inner class replaced with lambda expression
 				textVIN.setText("");
 	            textMake.setText("");
 	            textModel.setText("");
@@ -464,18 +462,17 @@ public class JTableApp extends JFrame{
 	            price.setText("");
 	            color.setText("");
 	            mileage.setText("");
-	            description.setText("");
-			}
-		});
+	            description.setText("");}
+			
+		);
 		btnClear.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnClear.setBounds(683, 191, 100, 30);
+		btnClear.setBounds(683, 150, 100, 30);
 		MainFrame.getContentPane().add(btnClear);		
 		
 		JButton btnSearch = new JButton("VIN search");
-		btnSearch.addActionListener(new ActionListener() {		//ActionListener inner class
-			public void actionPerformed(ActionEvent e) {
-				if(!textSearch.getText().equals("")) {
-					
+		btnSearch.addActionListener((event) ->{			//ActionListener inner class replaced with lambda expression
+			
+				if(!textSearch.getText().equals("")) {					
 					//CLEAR TXT
 		            textVIN.setText("");
 		            textMake.setText("");
@@ -493,22 +490,31 @@ public class JTableApp extends JFrame{
 					JOptionPane.showMessageDialog(null, "Enter VIN!");				
 				}
 			}
-		});
+		);
 		
 		btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnSearch.setBounds(25, 280, 92, 20);
-		MainFrame.getContentPane().add(btnSearch);
+		btnSearch.setBounds(25, 280, 92, 25);
+		MainFrame.getContentPane().add(btnSearch);		
 		
-		
-		JButton btnLoad = new JButton("LOAD");
-		btnLoad.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
+		JButton btnLoad = new JButton("LOAD FROM FILE");
+		btnLoad.addActionListener( (event) -> {			
+			DBConnection.loadFromFile();			
+			retrieve();
+			JOptionPane.showMessageDialog(null, "Database restored from backup file!");
 			}
-		});
+		);
 		btnLoad.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnLoad.setBounds(683, 237, 100, 30);
+		btnLoad.setBounds(651, 191, 163, 30);
 		MainFrame.getContentPane().add(btnLoad);
 		
+		JButton btnCopyToFile = new JButton("COPY TO FILE");
+		btnCopyToFile.addActionListener( (event) -> {
+			DBConnection.copyToFile();
+			JOptionPane.showMessageDialog(null, "Database copied to backup file!");
+			}
+		);
+		btnCopyToFile.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnCopyToFile.setBounds(651, 232, 163, 30);
+		MainFrame.getContentPane().add(btnCopyToFile);
 	}
 }

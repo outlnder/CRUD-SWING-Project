@@ -67,8 +67,7 @@ public class JTableLogin extends JFrame {
 		
 		
 		JButton btnLogin = new JButton("LOGIN");
-		btnLogin.addActionListener(new ActionListener() {		//ActionListener inner class
-			public void actionPerformed(ActionEvent e) {				
+		btnLogin.addActionListener((event) -> {			//ActionListener inner class replaced with lambda expression			
 				
 					loginCredentials = new HashMap<>();
 					assert User.getList()==null : "Empty Source Of Users";
@@ -79,8 +78,7 @@ public class JTableLogin extends JFrame {
 					for (Admin admin: Admin.getList()) {
 						loginCredentials.put(admin.getLogin(), admin.getPassword());
 					}
-					
-				
+									
 				String username = textUserName.getText();				
 				String password = textPassword.getText();				
 				
@@ -94,9 +92,8 @@ public class JTableLogin extends JFrame {
 					JTableApp.startJTableApp();	
 					}
 					else JOptionPane.showMessageDialog(null, "Incorrect login or password!");
-				}				
-			
-		});
+				}			
+		);
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnLogin.setBounds(83, 115, 100, 25);
 		contentPane.add(btnLogin);
