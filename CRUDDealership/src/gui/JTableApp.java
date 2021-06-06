@@ -2,12 +2,13 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import javax.swing.*;
 import javax.swing.table.*;
 import db.DBConnection;
 
 
-public class JTableApp extends JFrame{
+public class JTableApp extends JFrame{	
 	
 	// Variables declaration
 	private JTextField textVIN;	
@@ -18,7 +19,6 @@ public class JTableApp extends JFrame{
 	private JTextField color;
 	private JTextField mileage;
 	private JTextField description;
-	private JTextField textSearch;
 	
 	private JButton btnAdd;
 	private JButton btnUpdate;
@@ -26,23 +26,24 @@ public class JTableApp extends JFrame{
 	private JButton btnClear;
 	private DefaultTableModel dm;
 	
-	private JFrame MainFrame;
+	private JFrame mainFrame;
 	private JTable table;
-	private JScrollPane scrollPane;	 
+	private JScrollPane scrollPane;
+	
 	
 	//Launch the application	 
 	public static void startJTableApp() {
-		EventQueue.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				try {
+				try {					
 					JTableApp window = new JTableApp();
-					window.MainFrame.setVisible(true);
+					window.pack();
+					window.mainFrame.setVisible(true);					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-		});
-		
+		});		
 	}
 
 	//Create the application window	 
@@ -53,143 +54,142 @@ public class JTableApp extends JFrame{
 	
 	
 	//Update application table after every change	
-	private void retrieve(){
+	private void retrieve(){		
 		dm = new DBConnection().getData();
-		table.setModel(dm);    
-     
-     table.setAutoCreateRowSorter(true);
-    }
-	
+		table.setModel(dm);     
+		table.setAutoCreateRowSorter(true);
+	}    	
+
 	//Update application table after every change	
-		private void retrieveSearchedTable(String searchVin){
-			dm = new DBConnection().getSearchedData(searchVin);
-			table.setModel(dm);   
-	    }
+	private void retrieveSearchedTable(String searchVin){		
+		dm = new DBConnection().getSearchedData(searchVin);
+		table.setModel(dm); 
+	}	    
+		
+	//Update application table after applying budget
+	private void retrieveSearchedTable(Double price){
+		dm = new DBConnection().getSearchedData(price);
+		table.setModel(dm);   
+		}
 
 	//Initialize the contents of the frame	
 	private void initialize() {		
 		
 		//jframe
-		MainFrame = new JFrame();
-		MainFrame.setTitle("BRAZHKO MOTORS");
-		MainFrame.setBounds(100, 100, 900, 560);
-		MainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		MainFrame.getContentPane().setLayout(null);
+		mainFrame = new JFrame();
+		mainFrame.setTitle("BRAZHKO MOTORS");
+		mainFrame.setBounds(100, 100, 900, 560);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.getContentPane().setLayout(null);
 		
 		//jlabels
 		JLabel lblVIN = new JLabel("VIN");
 		lblVIN.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblVIN.setBounds(32, 26, 110, 30);
-		MainFrame.getContentPane().add(lblVIN);			
+		mainFrame.getContentPane().add(lblVIN);			
 		
 		JLabel lblMake = new JLabel("Make");
 		lblMake.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblMake.setBounds(32, 67, 110, 30);
-		MainFrame.getContentPane().add(lblMake);
+		mainFrame.getContentPane().add(lblMake);
 		
 		JLabel lblModel = new JLabel("Model");
 		lblModel.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblModel.setBounds(32, 108, 110, 30);
-		MainFrame.getContentPane().add(lblModel);
+		mainFrame.getContentPane().add(lblModel);
 
 		JLabel lblYear = new JLabel("Year");
 		lblYear.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblYear.setBounds(32, 149, 110, 30);
-		MainFrame.getContentPane().add(lblYear);
+		mainFrame.getContentPane().add(lblYear);
 		
 		JLabel lblPrice = new JLabel("Price");
 		lblPrice.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblPrice.setBounds(32, 190, 110, 30);
-		MainFrame.getContentPane().add(lblPrice);
+		mainFrame.getContentPane().add(lblPrice);
 				
 		JLabel lblBody = new JLabel("Body");
 		lblBody.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblBody.setBounds(32, 231, 110, 30);
-		MainFrame.getContentPane().add(lblBody);
+		mainFrame.getContentPane().add(lblBody);
 		
 		JLabel lblColor = new JLabel("Color");
 		lblColor.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblColor.setBounds(318, 26, 110, 30);
-		MainFrame.getContentPane().add(lblColor);
+		mainFrame.getContentPane().add(lblColor);
 		
 		JLabel lblMileage = new JLabel("Mileage");
 		lblMileage.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblMileage.setBounds(318, 67, 110, 30);
-		MainFrame.getContentPane().add(lblMileage);
+		mainFrame.getContentPane().add(lblMileage);
 		
 		JLabel lblTransmission = new JLabel("Transmission");
 		lblTransmission.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblTransmission.setBounds(318, 108, 110, 30);
-		MainFrame.getContentPane().add(lblTransmission);
+		mainFrame.getContentPane().add(lblTransmission);
 		
 		JLabel lblDescription = new JLabel("Description");
 		lblDescription.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblDescription.setBounds(318, 149, 110, 30);
-		MainFrame.getContentPane().add(lblDescription);
+		mainFrame.getContentPane().add(lblDescription);
 		
 		JLabel lblCondition = new JLabel("Condition");
 		lblCondition.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblCondition.setBounds(318, 190, 110, 30);
-		MainFrame.getContentPane().add(lblCondition);
+		mainFrame.getContentPane().add(lblCondition);
 		
 		JLabel lblStatus = new JLabel("Status");
 		lblStatus.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblStatus.setBounds(318, 231, 110, 30);
-		MainFrame.getContentPane().add(lblStatus);
+		mainFrame.getContentPane().add(lblStatus);
 		
 		//jtexts
 		textVIN = new JTextField();
 		textVIN.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textVIN.setColumns(10);
 		textVIN.setBounds(102, 26, 120, 30);
-		MainFrame.getContentPane().add(textVIN);		
+		mainFrame.getContentPane().add(textVIN);		
 		
 		textMake = new JTextField();
 		textMake.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textMake.setColumns(10);
 		textMake.setBounds(102, 67, 120, 30);
-		MainFrame.getContentPane().add(textMake);
+		mainFrame.getContentPane().add(textMake);
 		
 		textModel = new JTextField();
 		textModel.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textModel.setColumns(10);
 		textModel.setBounds(102, 108, 120, 30);
-		MainFrame.getContentPane().add(textModel);
+		mainFrame.getContentPane().add(textModel);
 		
 		year = new JTextField();
 		year.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		year.setColumns(10);
 		year.setBounds(102, 149, 120, 30);
-		MainFrame.getContentPane().add(year);
+		mainFrame.getContentPane().add(year);
 		
 		price = new JTextField();
 		price.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		price.setBounds(102, 190, 120, 30);
-		MainFrame.getContentPane().add(price);
+		mainFrame.getContentPane().add(price);
 				
 		color = new JTextField();
 		color.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		color.setColumns(10);
 		color.setBounds(438, 26, 120, 30);
-		MainFrame.getContentPane().add(color);
+		mainFrame.getContentPane().add(color);
 		
 		mileage = new JTextField();
 		mileage.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		mileage.setColumns(10);
 		mileage.setBounds(438, 67, 120, 30);
-		MainFrame.getContentPane().add(mileage);
+		mainFrame.getContentPane().add(mileage);
 		
 		description = new JTextField();
 		description.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		description.setColumns(10);
 		description.setBounds(438, 149, 120, 30);
-		MainFrame.getContentPane().add(description);
-		
-		textSearch = new JTextField();
-		textSearch.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		textSearch.setColumns(10);
-		textSearch.setBounds(115, 280, 100, 25);
-		MainFrame.getContentPane().add(textSearch);		
+		mainFrame.getContentPane().add(description);
 		
 		JComboBox body = new JComboBox();
 		body.setAutoscrolls(true);
@@ -198,7 +198,7 @@ public class JTableApp extends JFrame{
 		body.setName("Body");
 		body.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		body.setBounds(102, 231, 120, 30);
-		MainFrame.getContentPane().add(body);		
+		mainFrame.getContentPane().add(body);		
 		
 		JComboBox transmission = new JComboBox();
 		transmission.setName("transmission");
@@ -207,7 +207,7 @@ public class JTableApp extends JFrame{
 		transmission.setModel(new DefaultComboBoxModel(new String[] {"Automatic", "Manual", "Other"}));
 		transmission.setSelectedIndex(0);
 		transmission.setBounds(438, 108, 120, 30);
-		MainFrame.getContentPane().add(transmission);		
+		mainFrame.getContentPane().add(transmission);		
 		
 		JComboBox status = new JComboBox();
 		status.setAutoscrolls(true);
@@ -215,7 +215,7 @@ public class JTableApp extends JFrame{
 		status.setModel(new DefaultComboBoxModel(new String[] {"In Stock", "Sold", "Pending"}));
 		status.setSelectedIndex(0);
 		status.setBounds(438, 231, 120, 30);
-		MainFrame.getContentPane().add(status);		
+		mainFrame.getContentPane().add(status);		
 		
 		JComboBox condition = new JComboBox();
 		condition.setModel(new DefaultComboBoxModel(new String[] {"New", "Used"}));
@@ -223,18 +223,18 @@ public class JTableApp extends JFrame{
 		condition.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		condition.setAutoscrolls(true);
 		condition.setBounds(438, 190, 120, 30);
-		MainFrame.getContentPane().add(condition);		
+		mainFrame.getContentPane().add(condition);		
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(32, 319, 816, 174);
-		MainFrame.getContentPane().add(scrollPane);
+		mainFrame.getContentPane().add(scrollPane);
+		
 		
 		table = new JTable();
 		table.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.addMouseListener(new MouseAdapter() {		//MouseAdapter inner class
-            
-			public void mouseClicked(MouseEvent evt) {
+		table.addMouseListener(new MouseAdapter() {		//MouseAdapter inner class            
+			public void mouseClicked(MouseEvent evt) {				
             	//get values from selected row
             	String vin = table.getValueAt(table.getSelectedRow(), 0).toString();
     	        String make = table.getValueAt(table.getSelectedRow(), 1).toString();
@@ -268,7 +268,7 @@ public class JTableApp extends JFrame{
         	        	condition.setSelectedIndex(i);
         		for (int i = 0; i < status.getItemCount(); i++)
         	        if(stat.equalsIgnoreCase((String) status.getItemAt(i)))
-        	        	status.setSelectedIndex(i);    	        
+        	        	status.setSelectedIndex(i);				
             }
         });
 		scrollPane.setViewportView(table);
@@ -278,8 +278,7 @@ public class JTableApp extends JFrame{
 		btnAdd = new JButton("ADD");
 		btnAdd.addActionListener(new ActionListener() {		//ActionListener inner class
 			@SuppressWarnings("static-access")
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(ActionEvent e) {				
 				if(textVIN.getText().length()<4||textVIN.getText().length()>=14) {
 					JOptionPane.showMessageDialog(null, "VIN must be between 5 and 14 characters!");
 				}
@@ -334,25 +333,23 @@ public class JTableApp extends JFrame{
 			            color.setText("");
 			            mileage.setText("");
 			            description.setText("");
-			            			 
+			            System.out.println(Thread.currentThread().getName());	 
 			            retrieve();
 			        }
 				else {
 			            JOptionPane.showMessageDialog(null, "Not Saved");			            
-			   }
+			   }			
 			}
 		});
 		btnAdd.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnAdd.setBounds(683, 27, 100, 30);
-		MainFrame.getContentPane().add(btnAdd);
-		
+		btnAdd.setBounds(675, 26, 100, 30);
+		mainFrame.getContentPane().add(btnAdd);		
 		
 		
 		btnUpdate = new JButton("UPDATE");
 		btnUpdate.addActionListener(new ActionListener() {		//ActionListener inner class
 			@SuppressWarnings("static-access")
-			public void actionPerformed(ActionEvent e) {
-		       
+			public void actionPerformed(ActionEvent e) {						       
 				if(textVIN.getText().length()<4||textVIN.getText().length()>=14) {
 					JOptionPane.showMessageDialog(null, "VIN must be between 5 and 14 characters!");
 				}
@@ -409,18 +406,17 @@ public class JTableApp extends JFrame{
 		            retrieve();
 		        } else {
 		            JOptionPane.showMessageDialog(null, "Not Updated");		            
-		        }
+		        }				
 			}
 		});
 		btnUpdate.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUpdate.setBounds(683, 68, 100, 30);
-		MainFrame.getContentPane().add(btnUpdate);
-		
+		btnUpdate.setBounds(675, 67, 100, 30);
+		mainFrame.getContentPane().add(btnUpdate);		
 		
 		
 		btnDel = new JButton("DELETE");
 		btnDel.addActionListener(new ActionListener() {		//ActionListener inner class
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {				
 		        String[] options = {"Yes", "No"};
 		        int answ = JOptionPane.showOptionDialog(null, "Sure To Delete?", "Deleted",
 		        		JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);		 
@@ -445,12 +441,12 @@ public class JTableApp extends JFrame{
 		            {
 		                JOptionPane.showMessageDialog(null, "Not Deleted");		                
 		            }		 
-		        }
+		        }				
 			}
 		});
 		btnDel.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnDel.setBounds(683, 109, 100, 30);
-		MainFrame.getContentPane().add(btnDel);		
+		btnDel.setBounds(675, 108, 100, 30);
+		mainFrame.getContentPane().add(btnDel);		
 		
 		
 		btnClear = new JButton("CLEAR");
@@ -466,55 +462,103 @@ public class JTableApp extends JFrame{
 			
 		);
 		btnClear.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnClear.setBounds(683, 150, 100, 30);
-		MainFrame.getContentPane().add(btnClear);		
+		btnClear.setBounds(675, 149, 100, 30);
+		mainFrame.getContentPane().add(btnClear);		
 		
-		JButton btnSearch = new JButton("VIN search");
-		btnSearch.addActionListener((event) ->{			//ActionListener inner class replaced with lambda expression
-			
-				if(!textSearch.getText().equals("")) {					
-					//CLEAR TXT
-		            textVIN.setText("");
-		            textMake.setText("");
-		            textModel.setText("");
-		            year.setText("");
-		            price.setText("");
-		            color.setText("");
-		            mileage.setText("");
-		            description.setText("");
-		 
-		            retrieveSearchedTable(textSearch.getText());					
-				}
-				else {
-					retrieve();	
-					JOptionPane.showMessageDialog(null, "Enter VIN!");				
-				}
-			}
-		);
-		
-		btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		btnSearch.setBounds(25, 280, 92, 25);
-		MainFrame.getContentPane().add(btnSearch);		
-		
+				
 		JButton btnLoad = new JButton("LOAD FROM FILE");
 		btnLoad.addActionListener( (event) -> {			
-			DBConnection.loadFromFile();			
-			retrieve();
-			JOptionPane.showMessageDialog(null, "Database restored from backup file!");
-			}
+			String currentDirPath = "D:\\";			
+			JFileChooser fileChooser = new JFileChooser(currentDirPath);			
+			fileChooser.setDialogTitle("CHOOSE BACKUP FILE");			
+			try {
+				int chooser = fileChooser.showOpenDialog(null);			
+				if (chooser == JFileChooser.APPROVE_OPTION) {				
+					File file = fileChooser.getSelectedFile();
+					String path = file.getAbsolutePath();
+					DBConnection.loadFromFile(path);
+					JOptionPane.showMessageDialog(null, "Database restored from backup file!");
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Database not restored!");
+				}
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Cannot read file! Choose file backup.txt!!!");
+				e.printStackTrace();
+			}			
+			retrieve();				
+		}
 		);
 		btnLoad.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnLoad.setBounds(651, 191, 163, 30);
-		MainFrame.getContentPane().add(btnLoad);
+		btnLoad.setBounds(643, 190, 163, 30);
+		mainFrame.getContentPane().add(btnLoad);
 		
 		JButton btnCopyToFile = new JButton("COPY TO FILE");
-		btnCopyToFile.addActionListener( (event) -> {
+		btnCopyToFile.addActionListener( (event) -> {			
 			DBConnection.copyToFile();
+			if ( SwingUtilities.isEventDispatchThread() == true ) {
+				
+				}			
 			JOptionPane.showMessageDialog(null, "Database copied to backup file!");
-			}
+			}		
 		);
 		btnCopyToFile.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnCopyToFile.setBounds(651, 232, 163, 30);
-		MainFrame.getContentPane().add(btnCopyToFile);
+		btnCopyToFile.setBounds(643, 231, 163, 30);
+		mainFrame.getContentPane().add(btnCopyToFile);
+		
+		
+		JButton btnSearchGeneral = new JButton("SEARCH VIN");
+		btnSearchGeneral.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {				
+				int vinSearch = -1;	//no value entered 
+				while (vinSearch < 0) {		//value entered in popup window cell
+					String input = JOptionPane.showInputDialog("Enter VIN");
+					if(input.length() > 4) {	//value validation
+						vinSearch++;	//change entered VIN to proceed end exit while loop
+						retrieveSearchedTable(input);						
+					}
+					else {
+						retrieve();	
+						JOptionPane.showMessageDialog(null, "Enter correct VIN! It must be between 5 and 14 characters long!");						
+					}
+				}				
+			}
+		});
+		btnSearchGeneral.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnSearchGeneral.setBounds(32, 278, 155, 30);
+		mainFrame.getContentPane().add(btnSearchGeneral);
+		
+		
+		JButton btnSetYourBudget = new JButton("SET YOUR BUDGET");
+		btnSetYourBudget.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {				
+				int prc = -1;	//no value entered 
+				while (prc < 0) {		//value entered in popup window cell
+					String input = JOptionPane.showInputDialog("Enter your budget! It must be over 999!");
+					if(input.length() > 3) {	//value validation
+						prc++;	//change entered price to proceed end exit while loop
+						retrieveSearchedTable(Double.parseDouble(input));						
+					}
+					else {
+						retrieve();	
+						JOptionPane.showMessageDialog(null, "Enter correct budget!");						
+					}
+				}
+			}
+		});
+		btnSetYourBudget.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnSetYourBudget.setBounds(219, 278, 155, 30);
+		mainFrame.getContentPane().add(btnSetYourBudget);
+		
+		
+		JButton btnReset = new JButton("RESET");
+		btnReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				retrieve();
+			}
+		});
+		btnReset.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnReset.setBounds(403, 278, 155, 30);
+		mainFrame.getContentPane().add(btnReset);
 	}
 }

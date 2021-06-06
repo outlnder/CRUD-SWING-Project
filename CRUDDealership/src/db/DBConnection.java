@@ -4,24 +4,20 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.*;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import entities.Car;
 import gui.*;
 
 
-public class DBConnection {
-	
-	private JTable table;
+public class DBConnection{	
 	
 	static String conString = "jdbc:mysql://localhost:3306/?allowPublicKeyRetrieval=true&useSSL=false";
     static String username = "root";
     static String password = "Pilsner1";
-    ArrayList<Car> list = (ArrayList<Car>) carList();
+    private ArrayList<Car> list = (ArrayList<Car>) carList();    
+    private ArrayList<Car> searchedList = new ArrayList<Car>();
     
-    ArrayList<Car> searchedList = new ArrayList<Car>();
-    
-  //Get ArrayList of Car objects from database
+    //Get ArrayList of Car objects from database
     public static ArrayList<Car> carList() {
     	 
     	ArrayList<Car> carList = new ArrayList<Car>();		
@@ -60,13 +56,9 @@ public class DBConnection {
     
     //Get data from ArrayList and insert it in application table
     public DefaultTableModel getData() {    	
-    	
-    	Collections.sort(list, Car.CarVinComparator);
-        
+    	Collections.sort(list, Car.CarVinComparator);        
         String columns[] = {"vin", "make", "model", "year", "price", "body", "color", "mileage", "transmission", "description", "condition", "status"};
-
-        DefaultTableModel dm = new DefaultTableModel(columns, 0);
-        new DBConnection();                                                    
+        DefaultTableModel dm = new DefaultTableModel(columns, 0);                                                      
 
         //Getting values from ArrayList
         for(Car car: list) {        	
@@ -84,7 +76,7 @@ public class DBConnection {
             String status = car.getStatus();             
             dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});            
         }         
-    return dm; 
+    return dm;    	
     }    
     
     //Insert into database
@@ -136,7 +128,7 @@ public class DBConnection {
     }
  
     //Delete data
-    public Boolean delete(String vin){
+    public static Boolean delete(String vin){
         
         String delQuery = "DELETE FROM `car_dealership`.`dealership_inventory` WHERE (`vin` = " + vin +")";
  
@@ -154,13 +146,11 @@ public class DBConnection {
     }
     
     //Get data for searched VIN 
-    public DefaultTableModel getSearchedData(String searchVin) {    	
-    	
-    	for(Car car: list) {
-    		if(car.getVin().equals(searchVin)) {
-    			searchedList.add(car);    			
-    		}
-    	}
+    public DefaultTableModel getSearchedData(String searchVin) {
+    	//filter entered VIN in searchedList
+    	searchedList = list.stream()
+    			.filter(c->c.getVin().equalsIgnoreCase(searchVin))
+    			.collect(Collectors.toCollection(ArrayList::new));    	
     	Collections.sort(searchedList, Car.CarVinComparator);
                 
         String columns[] = {"vin", "make", "model", "year", "price", "body", "color", "mileage", "transmission", "description", "condition", "status"};
@@ -184,10 +174,41 @@ public class DBConnection {
             String status = car.getStatus();             
             dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});            
         }         
-    return dm; 
+    return dm;    	
     }
     
-    public static void loadFromFile(){
+    //Get data for searched price
+    public DefaultTableModel getSearchedData(Double maxCarPrice) {    	
+    	searchedList = list.stream()
+    			.filter(c->c.getPrice() < maxCarPrice)
+    			.collect(Collectors.toCollection(ArrayList::new));
+    	Collections.sort(searchedList, Car.CarPriceComparator);
+                
+        String columns[] = {"vin", "make", "model", "year", "price", "body", "color", "mileage", "transmission", "description", "condition", "status"};
+
+        DefaultTableModel dm = new DefaultTableModel(columns, 0);
+        new DBConnection();                                                   
+        
+        //Getting values from ArrayList
+        for(Car car: searchedList) {        	
+            String vin = car.getVin();
+            String make = car.getMake();
+            String model = car.getModel();            
+            String year = String.valueOf(car.getYear());
+            String price = String.valueOf(car.getPrice());
+            String body = car.getBody();
+            String color = car.getColor();
+            String mileage = String.valueOf(car.getMileage());
+            String transmission = car.getTransmission();
+            String description = car.getDescription();
+            String condition = car.getCondition();
+            String status = car.getStatus();             
+            dm.addRow(new String[]{vin, make, model, year, price, body, color, mileage, transmission, description, condition, status});            
+        }         
+    return dm;    	
+    }
+     
+    public static void loadFromFile(String path){
     	ArrayList<Car> listForComparison = carList();
     	BufferedReader br = null;
     	//list of arrays, where each array represents a car (read from backup file)
@@ -197,7 +218,7 @@ public class DBConnection {
     			map(Car::getVin).
     			collect(Collectors.toCollection(ArrayList::new));    	
         try {
-            br = new BufferedReader(new FileReader("D:\\backupfile.txt"));
+            br = new BufferedReader(new FileReader(path));  //"D:\\backupfile.txt"
             String line;
             while ((line = br.readLine()) != null) {
             	String[] values = line.split("\\|"); 
@@ -257,7 +278,6 @@ public class DBConnection {
             con.close();            
 		} catch (SQLException|IOException ex) {
 			System.err.println(ex);	
-		}
-    }
-	
+		}    	
+    }	
 }

@@ -144,5 +144,14 @@ public class Car{
  
     	   return vin1.compareTo(vin2);
      }};
+     
+     public static Comparator<Car> CarPriceComparator = new Comparator<Car>() {
+
+     	public int compare(Car car1, Car car2) {
+     	   Double price1 = car1.getPrice();
+     	   Double price2 = car2.getPrice();
+  
+     	   return price2.compareTo(price1);
+      }};
 	
 }

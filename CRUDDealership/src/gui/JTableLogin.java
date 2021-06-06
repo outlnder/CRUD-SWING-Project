@@ -7,21 +7,20 @@ import java.awt.event.*;
 import java.util.*;
 import entities.*;
 
-public class JTableLogin extends JFrame {
+public class JTableLogin extends JFrame{
 	
 	private JPanel contentPane;
 	private JTextField textUserName;
 	private JTextField textPassword;
 	private static HashMap<String, String> loginCredentials;
-	public static JTableLogin frame;	
-	
+	private static JTableLogin frame;
 	
 	/**
 	 * Launch the application.
 	 */	
 	public static void main(String[] args) {
 		
-		EventQueue.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					frame = new JTableLogin();
@@ -89,7 +88,7 @@ public class JTableLogin extends JFrame {
 					//launch main window
 					JTableApp app = new JTableApp();
 					app.setVisible(true);
-					JTableApp.startJTableApp();	
+					JTableApp.startJTableApp();					
 					}
 					else JOptionPane.showMessageDialog(null, "Incorrect login or password!");
 				}			
@@ -97,5 +96,5 @@ public class JTableLogin extends JFrame {
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnLogin.setBounds(83, 115, 100, 25);
 		contentPane.add(btnLogin);
-	}
+	}	
 }

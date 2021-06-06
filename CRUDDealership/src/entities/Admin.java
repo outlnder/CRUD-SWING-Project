@@ -21,7 +21,7 @@ public class Admin extends GeneralUser{
         this.password = password;        
     }
     
-    @SuppressWarnings("serial")
+    
 	private static List<Admin> adminList = new ArrayList<Admin>() {
 		{
 		add(new Admin("admin1", "admin1"));

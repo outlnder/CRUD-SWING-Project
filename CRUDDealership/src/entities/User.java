@@ -22,7 +22,7 @@ public class User extends GeneralUser{
         this.password = password;
 	}
 	
-	@SuppressWarnings("serial")
+
 	private static List<User> userList = new ArrayList<User>(){
 		{
 		add(new User("user1", "user1"));
